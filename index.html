@@ -2,53 +2,74 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<title>ゆうみのパチスロ</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>🎰 新スロットおみくじ 🎰</title>
 
 <style>
 
 body{
-background:#111;
-color:white;
-text-align:center;
-font-family:sans-serif;
-margin-top:80px;
+  text-align:center;
+  font-family:sans-serif;
+  background:linear-gradient(#fff5f5,#ffecec);
+  margin:0;
 }
 
 h1{
-font-size:50px;
+  font-size:36px;
+  color:#b30000;
+  margin-top:20px;
+  text-shadow:1px 1px 2px gold;
 }
 
-#slot{
-font-size:90px;
-letter-spacing:30px;
-margin:40px;
+.slot{
+  display:flex;
+  justify-content:center;
+  margin:40px auto;
+}
+
+.reel{
+  font-size:60px;
+  width:80px;
+  height:80px;
+  margin:0 5px;
+  border:2px solid red;
+  border-radius:10px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:#fff0f0;
+  box-shadow:0 0 10px red inset;
 }
 
 button{
-font-size:30px;
-padding:20px 60px;
-border:none;
-border-radius:15px;
-background:red;
-color:white;
-cursor:pointer;
+  font-size:26px;
+  padding:15px 40px;
+  margin-top:20px;
+  background:#d60000;
+  color:white;
+  border:none;
+  border-radius:10px;
+  cursor:pointer;
+  box-shadow:0 0 10px gold;
 }
 
 #result{
-font-size:35px;
-margin-top:30px;
-height:50px;
+  font-size:32px;
+  margin-top:20px;
+  color:#b30000;
+  white-space: pre-line;
+  text-shadow:1px 1px 2px gold;
 }
 
 .win{
-color:gold;
-font-size:45px;
-animation:flash 0.4s infinite;
+  font-size:40px;
+  color:gold;
+  animation:flash 0.4s infinite;
 }
 
 @keyframes flash{
 0%{color:gold;}
-50%{color:white;}
+50%{color:red;}
 100%{color:gold;}
 }
 
@@ -57,37 +78,56 @@ animation:flash 0.4s infinite;
 
 <body>
 
-<h1>🎰 ゆうみのパチスロ 🎰</h1>
+<h1>🎰 新スロットおみくじ 🎰</h1>
 
-<div id="slot">？ ？ ？</div>
+<div class="slot">
+<div id="reel1" class="reel">❔</div>
+<div id="reel2" class="reel">❔</div>
+<div id="reel3" class="reel">❔</div>
+</div>
 
-<button onclick="start()">START</button>
+<button onclick="spin()">スピン</button>
 
 <div id="result"></div>
 
+<audio id="win" src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_115b9b0c67.mp3"></audio>
+
+<audio id="click" src="https://actions.google.com/sounds/v1/alarms/clock_ticking.ogg"></audio>
+
 <script>
 
+// 絵柄7種類
 const symbols = ["𝟕","𝟑","🍒","BAR","🔔","💎","🍉"];
 
-let timer;
+function spin(){
 
-function start(){
+const reels=[
+document.getElementById("reel1"),
+document.getElementById("reel2"),
+document.getElementById("reel3")
+];
 
-document.getElementById("result").className="";
-document.getElementById("result").innerHTML="";
-
-const click = new Audio("https://actions.google.com/sounds/v1/alarms/clock_ticking.ogg");
-const win = new Audio("https://actions.google.com/sounds/v1/cartoon/clang_and_wobble.ogg");
+const click=document.getElementById("click");
 
 let count=0;
 
-timer=setInterval(()=>{
+const interval=setInterval(()=>{
 
-let a=symbols[Math.floor(Math.random()*symbols.length)];
-let b=symbols[Math.floor(Math.random()*symbols.length)];
-let c=symbols[Math.floor(Math.random()*symbols.length)];
+for(let i=0;i<3;i++){
 
-document.getElementById("slot").innerHTML=a+" "+b+" "+c;
+const symbol=symbols[Math.floor(Math.random()*symbols.length)];
+
+if(symbol==="𝟕"){
+reels[i].innerHTML=`<span style="color:red;font-weight:bold">${symbol}</span>`;
+}
+else if(symbol==="𝟑"){
+reels[i].innerHTML=`<span style="color:blue;font-weight:bold">${symbol}</span>`;
+}
+else{
+reels[i].innerHTML=symbol;
+}
+
+}
 
 click.currentTime=0;
 click.play();
@@ -96,27 +136,38 @@ count++;
 
 if(count>20){
 
-clearInterval(timer);
+clearInterval(interval);
 
+const res=reels.map(r=>r.innerText);
+
+let message="";
 let result=document.getElementById("result");
+result.className="";
 
-if(a=="𝟕" && b=="𝟕" && c=="𝟕"){
+if(res[0]==="𝟕" && res[1]==="𝟕" && res[2]==="𝟕"){
 
+message="✨✨✨ BIG BONUS 𝟕𝟕𝟕 ✨✨✨";
 result.className="win";
-result.innerHTML="🎉🎉🎉 BIG BONUS 🎉🎉🎉";
-win.play();
+document.getElementById("win").play();
 
 }
-else if(a=="🍒" || b=="🍒" || c=="🍒"){
+else if(res.includes("🍒")){
 
-result.innerHTML="🍒 チェリー当たり！";
+message="🍒 チェリー小当たり！";
+
+}
+else if(res[0]===res[1] || res[1]===res[2] || res[0]===res[2]){
+
+message="ラッキー！ペア揃い😊";
 
 }
 else{
 
-result.innerHTML="はずれ";
+message="はずれ…😢";
 
 }
+
+result.innerText=message;
 
 }
 
@@ -128,4 +179,3 @@ result.innerHTML="はずれ";
 
 </body>
 </html>
-

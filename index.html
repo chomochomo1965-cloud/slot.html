@@ -35,8 +35,8 @@ margin:10px auto 30px auto;
 
 .reel{
 font-size:54px;
-width:130px;
-height:100px;
+width:140px;
+height:110px;
 margin:0 6px;
 border:3px solid red;
 border-radius:12px;
@@ -109,17 +109,18 @@ const symbols=["𝟕","𝟑","🍒","BAR","🔔","💎","🍉"];
 function drawSymbol(symbol){
 
 if(symbol==="𝟕"){
-return `<span style="display:block;width:100%;background:white;color:red;text-align:center;padding:6px 0;font-weight:bold;border:3px solid red;border-radius:6px;font-size:80px">𝟕</span>`;
+return `<span style="display:block;width:100%;background:white;color:red;text-align:center;padding:6px 0;font-weight:bold;border:3px solid red;border-radius:6px;font-size:85px">𝟕</span>`;
 }
 
 if(symbol==="𝟑"){
-return `<span style="color:blue;font-weight:bold;font-size:80px">𝟑</span>`;
+return `<span style="color:blue;font-weight:bold;font-size:85px">𝟑</span>`;
 }
+
 if(symbol==="BAR"){
 return `<span style="background:black;color:white;padding:6px 16px;border-radius:6px;border:2px solid red;font-weight:bold">BAR</span>`;
 }
 
-return symbol;
+return `<span style="font-size:60px">${symbol}</span>`;
 
 }
 
@@ -188,16 +189,19 @@ document.getElementById("win").play();
 }
 else if(res.includes("🍒")){
 
+result.className="";
 result.innerText="🍒 チェリー小当たり！";
 
 }
 else if(res[0]===res[1] || res[1]===res[2] || res[0]===res[2]){
 
+result.className="";
 result.innerText="ラッキー！ペア揃い😊";
 
 }
 else{
 
+result.className="";
 result.innerText="はずれ…";
 
 }
@@ -208,5 +212,3 @@ result.innerText="はずれ…";
 
 </body>
 </html>
-
-

@@ -71,6 +71,7 @@ button{
   color:#b30000;
   white-space: pre-line;
   text-shadow:1px 1px 2px gold;
+  min-height:50px; /* ←高さ固定してスペース確保 */
 }
 .win{
   font-size:38px;
@@ -96,7 +97,7 @@ button{
   <div id="reel3" class="reel">❔</div>
 </div>
 
-<div id="result"></div>
+<div id="result">　<!-- 初期状態でもスペース確保 --></div>
 
 <div id="pointFrame">累計POINT：0\n今回獲得POINT：0</div>
 
@@ -111,11 +112,11 @@ const symbols=["𝟕","𝟑","🍒","BAR","🔔","💎","🍉"];
 const triplePoints = {
   "𝟕": 1000,
   "𝟑": 500,
-  "🍒": 30,
+  "🍒": 130,
   "BAR": 500,
-  "🔔": 40,
-  "💎": 60,
-  "🍉": 20
+  "🔔": 100,
+  "💎": 160,
+  "🍉": 120
 };
 
 // localStorageから累計POINT読み込み
@@ -146,7 +147,9 @@ function spin(){
 
   let resultArr = [];
   let click = document.getElementById("click");
-  document.getElementById("result").innerText="";
+
+  // スピン中もスペースを確保
+  document.getElementById("result").innerText = "　";
 
   function spinReel(reel){
     let s = symbols[Math.floor(Math.random()*symbols.length)];

@@ -99,13 +99,12 @@ button{
 <!-- リザルトメッセージ -->
 <div id="result"></div>
 
-<!-- POINT外枠（今回獲得 + 累計POINT） -->
-<div id="pointFrame">今回獲得POINT：0<br>累計POINT：0</div>
+<!-- POINT外枠（累計＋今回獲得POINT） -->
+<div id="pointFrame">累計POINT：0\n今回獲得POINT：0</div>
 
-<!-- 操作ボタンの順番を変更 -->
-<button onclick="spin()">スピン</button>
-<button onclick="buyPoints()">POINT購入</button>
+<!-- 操作ボタン（POINT購入ボタンを削除） -->
 <button onclick="resetPoints()">累計POINTリセット</button>
+<button onclick="spin()">スピン</button>
 
 <audio id="win" src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_115b9b0c67.mp3"></audio>
 <audio id="click" src="https://actions.google.com/sounds/v1/alarms/clock_ticking.ogg"></audio>
@@ -113,11 +112,11 @@ button{
 <script>
 const symbols=["𝟕","𝟑","🍒","BAR","🔔","💎","🍉"];
 const triplePoints = {
-  "𝟕": 200,
-  "𝟑":100,
-  "🍒": 30,
-  "BAR":100,
-  "🔔": 40,
+  "𝟕": 1000,
+  "𝟑": 200,
+  "🍒": 130,
+  "BAR": 180,
+  "🔔": 140,
   "💎": 60,
   "🍉": 20
 };
@@ -134,18 +133,16 @@ function drawSymbol(symbol){
   return `<span style="font-size:60px">${symbol}</span>`;
 }
 
-// POINT枠表示更新（今回獲得 + 累計POINT）
+// POINT枠表示更新（累計 + 今回獲得）
 function updatePointFrame(lastPoint){
-  document.getElementById("pointFrame").innerHTML = 
-    `今回獲得POINT：${lastPoint}<br>累計POINT：${totalPoint}`;
+  document.getElementById("pointFrame").innerText = `累計POINT：${totalPoint}\n今回獲得POINT：${lastPoint}`;
 }
 
 // スピン処理
 function spin(){
-  if(totalPoint < 10){
-    document.getElementById("result").innerText="POINTが不足しています！";
-    return;
-  }
+  // 3POINT消費（マイナスでも可）
+  totalPoint -= 10;
+  updatePointFrame(0);
 
   let reels = [
     document.getElementById("reel1"),
@@ -157,44 +154,42 @@ function spin(){
   let click = document.getElementById("click");
   document.getElementById("result").innerText="";
 
-  let spin1 = setInterval(() => {
+  let spin1=setInterval(()=>{
     let s = symbols[Math.floor(Math.random()*symbols.length)];
     reels[0].innerHTML = drawSymbol(s);
-    resultArr[0] = s;
     click.currentTime = 0; click.play();
-  }, 80);
+  },80);
 
-  let spin2 = setInterval(() => {
+  let spin2=setInterval(()=>{
     let s = symbols[Math.floor(Math.random()*symbols.length)];
     reels[1].innerHTML = drawSymbol(s);
-    resultArr[1] = s;
     click.currentTime = 0; click.play();
-  }, 80);
+  },80);
 
-  let spin3 = setInterval(() => {
+  let spin3=setInterval(()=>{
     let s = symbols[Math.floor(Math.random()*symbols.length)];
     reels[2].innerHTML = drawSymbol(s);
-    resultArr[2] = s;
     click.currentTime = 0; click.play();
-  }, 80);
+  },80);
 
-  setTimeout(() => { clearInterval(spin1); }, 1200);
-  setTimeout(() => { clearInterval(spin2); }, 1800);
-  setTimeout(() => {
+  setTimeout(()=>{
+    clearInterval(spin1);
+    resultArr[0] = reels[0].innerText;
+  },1200);
+
+  setTimeout(()=>{
+    clearInterval(spin2);
+    resultArr[1] = reels[1].innerText;
+  },1800);
+
+  setTimeout(()=>{
     clearInterval(spin3);
-    // 判定・ポイント計算
-    let point = judge(resultArr);
-
-    // スピン終了後に消費＆獲得POINTを反映
-    totalPoint -= 10; 
-    totalPoint += point;
-    localStorage.setItem("totalPoint", totalPoint);
-
-    updatePointFrame(point);
-  }, 2400);
+    resultArr[2] = reels[2].innerText;
+    judge(resultArr);
+  },2400);
 }
 
-// 判定関数（ポイントを返す）
+// 判定とポイント計算
 function judge(res){
   let result = document.getElementById("result");
   let point = 0;
@@ -219,10 +214,14 @@ function judge(res){
   else{
     point = 0;
     result.className="";
-    result.innerText="はずれ…😫";
+    result.innerText="はずれ😫";
   }
 
-  return point;
+  totalPoint += point;
+  localStorage.setItem("totalPoint", totalPoint);
+
+  // 外枠に今回獲得POINTと累計POINTを反映
+  updatePointFrame(point);
 }
 
 // 累計POINTリセット
@@ -231,14 +230,6 @@ function resetPoints(){
   localStorage.setItem("totalPoint", totalPoint);
   updatePointFrame(0);
   document.getElementById("result").innerText="累計POINTをリセットしました。";
-}
-
-// POINT購入 +50
-function buyPoints(){
-  totalPoint += 50;
-  localStorage.setItem("totalPoint", totalPoint);
-  updatePointFrame(0);
-  document.getElementById("result").innerText="POINTを購入しました。\n累計POINT：50追加！";
 }
 </script>
 
